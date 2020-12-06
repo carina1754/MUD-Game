@@ -39,6 +39,7 @@ public class play extends JFrame{
 	 int y;
 	 int count;
 	 int bossnum=0;
+	 int bossmap[][] = new int [9][2];
     public play(String str) {
     	BevelBorder border = new BevelBorder(BevelBorder.RAISED);
     	border=new BevelBorder(BevelBorder.RAISED);
@@ -129,8 +130,6 @@ public class play extends JFrame{
     	dul.setBorder(border);
     	durl.setBorder(border);
     	this.setContentPane(pn);
-    	Tile tile1 = new Tile(x, y);
-    	pn.add(tile1);
     	        loadMap(str);
     	        
     	        this.addKeyListener(new KeyListener(){
@@ -215,46 +214,89 @@ public class play extends JFrame{
                         if(map[x+1][y]==0 && map[x-1][y]==0 &&  map[x][y+1]==0 && map[x][y-1] >=1 )
 							u.setVisible(true);	
 						}
-					 	if(map[x][y]==2) {
-					 		tile1.setSize(panelSize, panelSize);
-	    	                tile1.setLocation((x*panelSize), (y*panelSize));
-	    	                tile1.setBackground(Color.YELLOW);
-	    	                tile1.setVisible(false);
-		    	    		System.out.print("aaaaa");
-		            		map[x][y]=1;
+						
+					 	if(map[x][y]>=2) {
+					    	Tile tile1 = new Tile(x, y);
+					    	pn.add(tile1);
+					    	int flag =0;
+					    	if(bossnum<8) {
+					    	for(int l=0;l<8;l++) {
+					    		if(bossmap[l][0] == x && bossmap[l][1] == y) {
+					    			flag=0;
+					    		break;
+					    		}
+					    		else 
+					    			flag=1;
+					    	}
+					    	if(flag==1){
+					    			System.out.print("보스 진입");
+					    			for(int l1=0;l1<8;l1++) {
+							    		if(bossmap[l1][0] != x || bossmap[l1][1] != y ) {
+									        bossmap[bossnum][0] = x;
+									 		bossmap[bossnum][1] = y;
+									 		bossnum++;
+									 		System.out.print(bossnum);
+									 		break;
+							    			}
+							    		else
+							    			break;
+					    			}
+					    			
+					    	}
+					    	}
+					 				for(int i=0;i<bossnum;i++) {
+					 					if(bossmap[i][0] == x && bossmap[i][1] == y) {
+					 						String[] buttons = {"배틀시작","도망가기"};
+									        int num = JOptionPane.showOptionDialog(null, i+1 + "단계 보스입니다. 배틀을 시작하겠습니까?", "BOSS 출현!",
+									                JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, buttons, "도망가기");
+						    	    		System.out.print("보스 출현");
+					        			if(num==0) {
+					        			JPanel pn1 = new JPanel();
+					        			pn.setVisible(false);
+					        			tile1.setSize(panelSize, panelSize);
+				    	                tile1.setLocation((x*panelSize), (y*panelSize));
+				    	                tile1.setBackground(Color.YELLOW);
+				    	                tile1.setVisible(true);
+					            		map[x][y]=1;
+					 					
+					        			}
+					        			else if(num==1)
+					        				break;
+					        			else
+					        				break;
+					        			}
+					        		}
 		            	}
-    					if(p.x == columns-2 && p.y == endLevelLoc && count==4){
-    						JOptionPane.showMessageDialog(null, "Congratulations, you've beaten the level!", "End Game", JOptionPane.INFORMATION_MESSAGE);
+					 	
+    					if(x == columns-2 && y == endLevelLoc && count>=4){
+    					    String[] buttons = {"다음 라운드","그만하기"};
+					        int num = JOptionPane.showOptionDialog(null, "보물을 찾았습니다! 다음 라운드로 진행 하겠습니까?", "보물 찾기 성공!",
+					                JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, buttons, "다음 라운드");
     						dispose();
     						rostr++;
     						new Maze();
     						new play("load.map");
     					}
-    					
+    					else if(x == columns-2 && y == endLevelLoc && count<4)
+    						JOptionPane.showMessageDialog(null, "보스를 4마리 이상 잡고 돌아오세요.");
     				}
 
     				@Override
     				public void keyReleased(KeyEvent arg0) {
     					// TODO Auto-generated method stub
-    					
     				}
 
     				@Override
     				public void keyTyped(KeyEvent arg0) {
     					// TODO Auto-generated method stub
-    					
     				}
-    	        	
     	        });
-    	        
     	        this.addWindowListener(new WindowAdapter(){
     	            public void windowClosing(WindowEvent e) {
     	                System.exit(0);
     	            }
     	        });
-    	        
     	        this.setLocationRelativeTo(null);
-    	        
     	        //Create player
     	    	p = new Player();
     	    	p.setVisible(true);
@@ -271,10 +313,9 @@ public class play extends JFrame{
     	                else if(map[x][y] == 0){
     	                    tile.setBackground(Color.PINK);
     	                }
-    	                else if(map[x][y]==2) {
+    	                else if(map[x][y]>=2) {
     	                	tile.setWall(false);
     	                	tile.setBackground(Color.RED);
-    	                	bossnum++;
     	                }
     	                else{
     	                    tile.setBackground(Color.WHITE);
@@ -282,21 +323,19 @@ public class play extends JFrame{
     	                    if(x == 0){
     	                    	p.setLocation((x*panelSize), (y*panelSize));
     	                    	p.y = y;
-    	                    }	
-    	                    
+    	                    }
     	                    if(y == rows-1){
     	                    	endLevelLoc = y;
     	                    }
     	                }
-    	                
     	                tile.setVisible(true);
     	                this.add(tile);
     	            }
     	        }
-    	        
     	        this.setVisible(true);
     
     }
+    
 public void loadMap(String str){
     try{
         BufferedReader br = new BufferedReader(new FileReader(str));

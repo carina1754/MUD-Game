@@ -20,6 +20,7 @@ public class Maze {
       private int height;
       private java.util.Random rand = new java.util.Random();
       int bossloc[] = new int[100];
+      private int k = 2;
       
       
       
@@ -91,8 +92,9 @@ public class Maze {
 	                	else
 	                	writer.print("0");
 	                } else {
-						if(bossloc[i]==j && i<30) {
-							writer.print("2");
+						if(bossloc[i]==j && i<30 && k<9) {
+							writer.print(Integer.toString(k));
+							k++;
 							i++;
 							j=1;
 						}
