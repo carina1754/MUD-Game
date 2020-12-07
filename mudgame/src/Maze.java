@@ -78,7 +78,7 @@ public class Maze {
       public void print() {
     	  try {
     		  for(int i=0;i<10;i++) {
-    	  			bossloc[i] =(int) ((Math.random() * (10 - 50)) + 50);
+    	  			bossloc[i] =(int) ((Math.random() * (20 - 50)) + 50);
     	  			System.out.println(bossloc[i]);
     	  			}
     		  int i=0,j=0;

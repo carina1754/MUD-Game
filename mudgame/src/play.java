@@ -11,6 +11,8 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.border.BevelBorder;
+
+import java.util.ArrayList;
 import java.util.Random;
 
 public class play extends JFrame{
@@ -34,13 +36,17 @@ public class play extends JFrame{
     public static int map[][] = new int[columns][rows];
     public static int endLevelLoc;
 
-    Player p;
+    Player player;
+    int gameflag = 0;
      int x;
 	 int y;
 	 int count;
 	 int bossnum=0;
-	 int bossmap[][] = new int [9][2];
-    public play(String str) {
+	 int bossmap[][] = new int [9][4];
+	 int bossattack =1;
+	 int bosshealth = 5;
+	 int aceval = 1;
+    public play() {
     	BevelBorder border = new BevelBorder(BevelBorder.RAISED);
     	border=new BevelBorder(BevelBorder.RAISED);
     	JPanel pn = new JPanel();
@@ -130,8 +136,60 @@ public class play extends JFrame{
     	dul.setBorder(border);
     	durl.setBorder(border);
     	this.setContentPane(pn);
-    	        loadMap(str);
-    	        
+    	        this.setLocationRelativeTo(null);
+    	        //Create player
+    	    	player = new Player();
+    	    	player.setVisible(true);
+    	    	player.setLocation(0,0);
+    	    	player.life =5;
+    	    	this.add(player);
+    	        //Color map
+    	        for(int y = 0; y < columns; y++){
+    	            for(int x = 0; x < rows; x++){
+    	                Tile tile = new Tile(x, y);
+    	                tile.setSize(panelSize, panelSize);
+    	                tile.setLocation((x*panelSize), (y*panelSize));
+    	                if((x==0&&y==0)||(x==29&&y==30))
+    	                    tile.setBackground(Color.YELLOW);
+    	                else if(map[x][y] == 0){
+    	                    tile.setBackground(Color.PINK);
+    	                }
+    	                else if(map[x][y]>=2) {
+    	                	tile.setWall(false);
+    	                	tile.setBackground(Color.RED);
+    	                }
+    	                else{
+    	                    tile.setBackground(Color.WHITE);
+    	                    tile.setWall(false);
+    	                    if(x == 0){
+    	                    	player.setLocation((x*panelSize), (y*panelSize));
+    	                    	player.y = y;
+    	                    }
+    	                    if(y == rows-1){
+    	                    	endLevelLoc = y;
+    	                    }
+    	                }
+    	                tile.setVisible(true);
+    	                this.add(tile);
+    	            }
+    	        }
+		    	u.setVisible(false);
+		    	ul.setVisible(false);
+		    	ur.setVisible(false);
+		    	ulr.setVisible(false);
+		    	d.setVisible(false);
+		    	dr.setVisible(false);
+		    	dl.setVisible(false);
+		    	dlr.setVisible(false);
+		    	du.setVisible(false);
+		    	dur.setVisible(false);
+		    	dul.setVisible(false);
+		    	durl.setVisible(false);
+		    	lr.setVisible(false);
+		    	l.setVisible(false);
+		    	r.setVisible(false);
+    	        this.setVisible(true);
+    	        this.setContentPane(pn);
     	        this.addKeyListener(new KeyListener(){
 
     				@Override
@@ -157,23 +215,23 @@ public class play extends JFrame{
     					//Player movement
     			    	
     					if(key == KeyEvent.VK_W){
-    						p.moveUp();	
+    						player.moveUp();	
     					}
     					
     					if(key == KeyEvent.VK_A){
-    						p.moveLeft();	
+    						player.moveLeft();	
     					}
     					
     					if(key == KeyEvent.VK_S){
-    						p.moveDown();	
+    						player.moveDown();	
     					}
     					
     					if(key == KeyEvent.VK_D){
-    						p.moveRight();	
+    						player.moveRight();	
     					}
     			
-						x=p.x;
-						y=p.y;
+						x=player.x;
+						y=player.y;
 						System.out.println("좌표 : " + x +" "+ y +" 값 : " + map[x][y]);
 						
 						if(x==0 && y == 0)
@@ -215,9 +273,18 @@ public class play extends JFrame{
 							u.setVisible(true);	
 						}
 						
+					 	if(player.life <= 0) {
+    					    String[] nolife = {"다시시작","그만하기"};
+					        int nolifepkg = JOptionPane.showOptionDialog(null, "체력이 모두 깎었습니다. 다시 하시겠습니까?", "The END",
+					                JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, nolife, "그만하기");
+					        if(nolifepkg==0) {
+					        	gameflag =1;
+    						}
+					        else
+					        	System.exit(0);
+						}
+					 	
 					 	if(map[x][y]>=2) {
-					    	Tile tile1 = new Tile(x, y);
-					    	pn.add(tile1);
 					    	int flag =0;
 					    	if(bossnum<8) {
 					    	for(int l=0;l<8;l++) {
@@ -234,7 +301,13 @@ public class play extends JFrame{
 							    		if(bossmap[l1][0] != x || bossmap[l1][1] != y ) {
 									        bossmap[bossnum][0] = x;
 									 		bossmap[bossnum][1] = y;
+									 		bossmap[bossnum][2] = bosshealth;
+									 		bossmap[bossnum][3] = bossattack;
+									 		
+									 		bosshealth++;
+									 		bossattack++;
 									 		bossnum++;
+									 		
 									 		System.out.print(bossnum);
 									 		break;
 							    			}
@@ -245,43 +318,152 @@ public class play extends JFrame{
 					    	}
 					    	}
 					 				for(int i=0;i<bossnum;i++) {
-					 					if(bossmap[i][0] == x && bossmap[i][1] == y) {
+					 					if(bossmap[i][0] == x && bossmap[i][1] == y && bossmap[i][2]>0) {
 					 						String[] buttons = {"배틀시작","도망가기"};
 									        int num = JOptionPane.showOptionDialog(null, i+1 + "단계 보스입니다. 배틀을 시작하겠습니까?", "BOSS 출현!",
 									                JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, buttons, "도망가기");
 						    	    		System.out.print("보스 출현");
-					        			if(num==0) {
-					        			JPanel pn1 = new JPanel();
-					        			pn.setVisible(false);
-					        			tile1.setSize(panelSize, panelSize);
-				    	                tile1.setLocation((x*panelSize), (y*panelSize));
-				    	                tile1.setBackground(Color.YELLOW);
-				    	                tile1.setVisible(true);
-					            		map[x][y]=1;
-					 					
+						    	    		int result = 4;
+						    	    		
+						    	    		for(;;) {
+					        			if(num==0 && result == 4 && bossmap[i][2]>0) {
+					        				Boss boss = new Boss();
+					 						Rule rule = new Rule();
+					 						
+					 						ArrayList<Card> deck = boss.setCard();
+					 						ArrayList<Card> bossCard = new ArrayList<Card>();
+					 						ArrayList<Card> playerCard = new ArrayList<Card>();
+					 						
+					 						System.out.println("블랙잭 게임 시작");
+					 						
+					 						bossCard.add(boss.getCard(deck));
+					 						bossCard.add(boss.getCard(deck));
+					 						int bossSum = rule.printCard("boss",bossCard,11);
+					 						int playerSum = rule.printCard("player",bossCard,11);
+					 						JOptionPane.showMessageDialog(null, "현재 보스의 체력 : " + bossmap[i][2] + " 나의 체력 : " + player.life);
+					 						while(!(rule.isBust(bossSum))) {
+					 							String[] black = {"hit","stand"};
+										        int jack = JOptionPane.showOptionDialog(null, "hit 하시겠습니까 stand 하시겠습니까?", "YOUR TURN",
+										                JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, black, "stand");
+										        
+										        if(jack==0) {
+										        	Card card = player.hit(boss, deck);
+										        	playerCard.add(card);
+										        	 aceval = rule.getAce(playerCard);
+										        	playerSum = rule.printCard("player", playerCard,aceval);
+										        	if(rule.isBust("player", playerSum)) {
+										        		result = 4;
+										        		player.life -= bossmap[i][3];
+										        		break;
+										        	}
+										        }
+										        
+										        else if(jack == 1) {
+										        	bossCard = boss.bossGetCard(bossSum,deck,bossCard);
+										        	bossSum = rule.getSum(bossCard,11);
+										        	if(rule.isBust("boss", bossSum)) {
+										        		result=4;
+									        			bossmap[i][2]--;
+										        		break;
+										        	}
+										        	result = rule.userWin(bossSum, playerSum);
+										        	if(result == 1) {
+										        			bossmap[i][2]--;
+										        			result=4;
+										        			break;
+										        	}
+										        	else if(result == 0) {
+										        		result=4;
+										        		player.life -= bossmap[i][3];
+										        		break;
+										        	}
+										        	else 
+										        		break;
+										        }
+										        else
+										        	break;
+					 						}
+					 						
+					 						if(num==0 && player.life <= 0) {
+						 						player.life -= bossmap[i][3];
+						 							if(player.life <= 0) {
+						 	    					    String[] nolife = {"다시시작","그만하기"};
+						 						        int nolifepkg = JOptionPane.showOptionDialog(null, "체력이 모두 깎었습니다. 다시 하시겠습니까?", "The END",
+						 						                JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, nolife, "그만하기");
+						 						        if(nolifepkg==0) {
+						 						        	gameflag = 1;
+						 	    						break;
+						 	    						}
+						 						        else
+						 						        	System.exit(0);
+						 							}
+								        		String[] lose = {"다시하기","도망가기"};
+										        int losepkg = JOptionPane.showOptionDialog(null, bossnum + "단계 보스에게 패배하였습니다. 재도전 하시겠습니까? 현재 남은 체력 : " + player.life , "YOU LOSE",
+										                JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, lose, "도망가기");
+										        if(losepkg==0) {
+										        	result = 4;
+										        	continue;
+										        	}
+										        	else
+										        		break;
+						 						}
+					 						else
+					 							break;
 					        			}
-					        			else if(num==1)
-					        				break;
+					        			
+							        	else if(num==0 && bossmap[i][2]==0) {
+						        			player.life += 2;
+							        		String[] win = {"계속하기"};
+							        		int winpkg = JOptionPane.showOptionDialog(null, bossnum + "단계 보스에게 승리하였습니다.", "YOU WIN",
+									                JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, win, "계속하기");
+							        		if(winpkg == 0) {
+							        			num=1;
+							        			break;
+							        		}
+							        	}
+							        	
+							        	else if(num==0 && result == 2 && bossmap[i][2] > 0) {
+							        		String[] push = {"다시하기","도망가기"};
+							        		int pushpkg = JOptionPane.showOptionDialog(null, bossnum + "단계 보스에게 비겼습니다. 재도전 하시겠습니까?", "DRAW",
+									                JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, push, "도망가기");
+							        	     if(pushpkg==0) {
+										        	result = 4;
+										        	continue;
+										        	}
+										        	else
+										        		break;
+					        			}
+							        	
 					        			else
 					        				break;
 					        			}
+						    	    		}
 					        		}
-		            	}
+					 				
+		            	}					 	
 					 	
-    					if(x == columns-2 && y == endLevelLoc && count>=4){
+					 	if(gameflag == 1) {
+					 		player.life=5;
+					 		dispose();
+					 		new play();
+					 	}
+					 	
+    					if(x == columns-2 && y == endLevelLoc){
+    						if(count>=4) {
     					    String[] buttons = {"다음 라운드","그만하기"};
 					        int num = JOptionPane.showOptionDialog(null, "보물을 찾았습니다! 다음 라운드로 진행 하겠습니까?", "보물 찾기 성공!",
 					                JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, buttons, "다음 라운드");
+					        player.life=5;
     						dispose();
     						rostr++;
-    						new Maze();
-    						new play("load.map");
+    						new play();
+    						}
+    						else
+    							JOptionPane.showMessageDialog(null, "보스를 4마리 이상 잡고 돌아오세요.");
     					}
-    					else if(x == columns-2 && y == endLevelLoc && count<4)
-    						JOptionPane.showMessageDialog(null, "보스를 4마리 이상 잡고 돌아오세요.");
     				}
 
-    				@Override
+					@Override
     				public void keyReleased(KeyEvent arg0) {
     					// TODO Auto-generated method stub
     				}
@@ -296,46 +478,22 @@ public class play extends JFrame{
     	                System.exit(0);
     	            }
     	        });
-    	        this.setLocationRelativeTo(null);
-    	        //Create player
-    	    	p = new Player();
-    	    	p.setVisible(true);
-    	    	p.setLocation(0,0);
-    	    	this.add(p);
-    	        //Color map
-    	        for(int y = 0; y < columns; y++){
-    	            for(int x = 0; x < rows; x++){
-    	                Tile tile = new Tile(x, y);
-    	                tile.setSize(panelSize, panelSize);
-    	                tile.setLocation((x*panelSize), (y*panelSize));
-    	                if((x==0&&y==0)||(x==29&&y==30))
-    	                    tile.setBackground(Color.YELLOW);
-    	                else if(map[x][y] == 0){
-    	                    tile.setBackground(Color.PINK);
-    	                }
-    	                else if(map[x][y]>=2) {
-    	                	tile.setWall(false);
-    	                	tile.setBackground(Color.RED);
-    	                }
-    	                else{
-    	                    tile.setBackground(Color.WHITE);
-    	                    tile.setWall(false);
-    	                    if(x == 0){
-    	                    	p.setLocation((x*panelSize), (y*panelSize));
-    	                    	p.y = y;
-    	                    }
-    	                    if(y == rows-1){
-    	                    	endLevelLoc = y;
-    	                    }
-    	                }
-    	                tile.setVisible(true);
-    	                this.add(tile);
-    	            }
-    	        }
-    	        this.setVisible(true);
     
     }
     
+	public void paintBoss(int x, int y,JPanel pn) {
+		// TODO Auto-generated method stub
+		Tile tile1 = new Tile(x, y);
+    	this.add(tile1);
+		tile1.setSize(panelSize, panelSize);
+        tile1.setLocation((x*panelSize), (y*panelSize));
+        tile1.setBackground(Color.YELLOW);
+        tile1.setVisible(true);
+        this.add(tile1);
+        this.setVisible(true);
+        this.setContentPane(pn);
+	}
+	
 public void loadMap(String str){
     try{
         BufferedReader br = new BufferedReader(new FileReader(str));
