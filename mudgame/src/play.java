@@ -349,7 +349,7 @@ public class play extends JFrame{
 										        if(jack==0) {
 										        	Card card = player.hit(boss, deck);
 										        	playerCard.add(card);
-										        	 aceval = rule.getAce(playerCard);
+										        	aceval = rule.getAce(playerCard);
 										        	playerSum = rule.printCard("player", playerCard,aceval);
 										        	if(rule.isBust("player", playerSum)) {
 										        		result = 4;
