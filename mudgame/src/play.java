@@ -327,6 +327,7 @@ public class play extends JFrame{
 						    	    		
 						    	    		for(;;) {
 					        			if(num==0 && result == 4 && bossmap[i][2]>0) {
+					        				pn.setVisible(false);
 					        				Boss boss = new Boss();
 					 						Rule rule = new Rule();
 					 						
@@ -338,10 +339,41 @@ public class play extends JFrame{
 					 						
 					 						bossCard.add(boss.getCard(deck));
 					 						bossCard.add(boss.getCard(deck));
+					 						
 					 						int bossSum = rule.printCard("boss",bossCard,11);
 					 						int playerSum = rule.printCard("player",bossCard,11);
+					 						
 					 						JOptionPane.showMessageDialog(null, "현재 보스의 체력 : " + bossmap[i][2] + " 나의 체력 : " + player.life);
+					 						
 					 						while(!(rule.isBust(bossSum))) {
+					 							
+					 							if(playerSum == 21 || bossSum ==21) {
+					 								if(bossSum != 21) {
+					 									String[] blackwin = {"계속하기"};
+										        		int blackwinpkg = JOptionPane.showOptionDialog(null, "블랙잭입니다!", "YOU WIN",
+												                JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, blackwin, "계속하기");
+										        		
+										        		if(blackwinpkg == 0) {
+										        			result = 4;
+										        			bossmap[i][2]--;
+										        			break;
+										        		}
+					 								}
+					 								
+					 								else {
+					 									String[] blacklose = {"계속하기"};
+					 									int blacklosepkg = JOptionPane.showOptionDialog(null, "보스가 블랙잭입니다!", "YOU LOSE",
+												                JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, blacklose, "계속하기");
+										        		if(blacklosepkg == 0) {
+										        			result = 4;
+						 									player.life -= bossmap[i][3];
+										        			break;
+										        		}
+					 								}
+					 							}
+					 							
+					 							aceval = rule.getAce(playerCard);
+					 							
 					 							String[] black = {"hit","stand"};
 										        int jack = JOptionPane.showOptionDialog(null, "hit 하시겠습니까 stand 하시겠습니까?", "YOUR TURN",
 										                JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, black, "stand");
@@ -349,7 +381,9 @@ public class play extends JFrame{
 										        if(jack==0) {
 										        	Card card = player.hit(boss, deck);
 										        	playerCard.add(card);
+										        	
 										        	aceval = rule.getAce(playerCard);
+										        	
 										        	playerSum = rule.printCard("player", playerCard,aceval);
 										        	if(rule.isBust("player", playerSum)) {
 										        		result = 4;
@@ -377,9 +411,19 @@ public class play extends JFrame{
 										        		player.life -= bossmap[i][3];
 										        		break;
 										        	}
+										        	else if(result == 2) {
+										        		String[] push = {"계속하기"};
+										        		int pushpkg = JOptionPane.showOptionDialog(null, bossnum + "단계 보스에게 비겼습니다.", "DRAW",
+												                JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, push, "계속하기");
+										        	     if(pushpkg==0) {
+													        	result = 4;
+													        	break;
+													        	}
+										        	}
 										        	else 
 										        		break;
 										        }
+										        
 										        else
 										        	break;
 					 						}
@@ -397,43 +441,22 @@ public class play extends JFrame{
 						 						        else
 						 						        	System.exit(0);
 						 							}
-								        		String[] lose = {"다시하기","도망가기"};
-										        int losepkg = JOptionPane.showOptionDialog(null, bossnum + "단계 보스에게 패배하였습니다. 재도전 하시겠습니까? 현재 남은 체력 : " + player.life , "YOU LOSE",
-										                JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, lose, "도망가기");
-										        if(losepkg==0) {
-										        	result = 4;
-										        	continue;
-										        	}
-										        	else
-										        		break;
-						 						}
+					 						}
 					 						else
-					 							break;
-					        			}
+					 							continue;
+						 				}
 					        			
-							        	else if(num==0 && bossmap[i][2]==0) {
+							        	else if(num==0 && bossmap[i][2] == 0) {
 						        			player.life += 2;
 							        		String[] win = {"계속하기"};
 							        		int winpkg = JOptionPane.showOptionDialog(null, bossnum + "단계 보스에게 승리하였습니다.", "YOU WIN",
 									                JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, win, "계속하기");
 							        		if(winpkg == 0) {
+							        			pn.setVisible(true);
 							        			num=1;
 							        			break;
 							        		}
 							        	}
-							        	
-							        	else if(num==0 && result == 2 && bossmap[i][2] > 0) {
-							        		String[] push = {"다시하기","도망가기"};
-							        		int pushpkg = JOptionPane.showOptionDialog(null, bossnum + "단계 보스에게 비겼습니다. 재도전 하시겠습니까?", "DRAW",
-									                JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, push, "도망가기");
-							        	     if(pushpkg==0) {
-										        	result = 4;
-										        	continue;
-										        	}
-										        	else
-										        		break;
-					        			}
-							        	
 					        			else
 					        				break;
 					        			}
@@ -527,31 +550,3 @@ public void loadMap(String str){
     }
 }
 }
-
-
-
-
-/*
-if (map[(int)p.getLocation().getX() + 1][(int)p.getLocation().getY()] != 0) {
-	if (map[(int)p.getLocation().getX() + 1][(int)p.getLocation().getY() + 1] != 0)
-		status.setText(right + down);
-	else if(map[(int)p.getLocation().getX() + 1][(int)p.getLocation().getY() - 1] != 0)
-		status.setText(right + up);
-	else
-		status.setText(right);
-}
-else if (map[(int)p.getLocation().getX() - 1][(int)p.getLocation().getY()] != 0) {
-	if (map[(int)p.getLocation().getX() - 1][(int)p.getLocation().getY() + 1] != 0)
-		status.setText(left + down);
-	else if(map[(int)p.getLocation().getX() - 1][(int)p.getLocation().getY() - 1] != 0)
-		status.setText(left + up);
-	else
-		status.setText(left);
-}
-else if (map[(int)p.getLocation().getX()][(int)p.getLocation().getY() + 1] != 0) {
-	status.setText(up);
-}
-else if (map[(int)p.getLocation().getX()][(int)p.getLocation().getY() - 1] != 0) {
-	status.setText(down);
-}*/
-

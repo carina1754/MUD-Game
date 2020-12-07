@@ -71,18 +71,6 @@ public class Rule {
 		return 1;
 	}
 	
-	public boolean isBlackJack(ArrayList<Card> deck) {
-		for(int i=0;i<deck.size();i++) {
-			String number = deck.get(i).getNumber();
-			if(number.equals("A")) {
-				if(number.equals("J") || number.equals("Q") || number.equals("K")) {
-					return true;
-				}
-			}
-		}
-		return false;
-	}
-	
 	public boolean isBust(int sum) {
 		if(sum>21) {
 			return true;
