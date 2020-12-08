@@ -12,8 +12,8 @@ public class Player extends JPanel{
     	this.setBackground(Color.getHSBColor(0.3f, 0.3f, 1));
     	this.setSize(play.panelSize, play.panelSize);
     }
-    public Card hit(Boss boss, ArrayList<Card> deck) {
-    	Card card = boss.getCard(deck);
+    public Card hit(Boss boss, ArrayList<Card> deck,float f) {
+    	Card card = boss.getCard(deck,f);
     	return card;
     }
     public void moveLeft() {
@@ -22,7 +22,7 @@ public class Player extends JPanel{
 	    	x--;
     	}
     }
-
+    
     public void moveRight() {
     	if(x < play.columns-1 && play.map[x+1][y] >= 1){
 	    	this.setLocation(this.getX()+25, this.getY());

@@ -1,7 +1,6 @@
 import java.util.ArrayList;
 
 public class Boss {
-	int num = (int)Math.random();
 	public ArrayList<Card> setCard(){
 		ArrayList<Card> deck = new ArrayList<Card>();
 		
@@ -9,16 +8,16 @@ public class Boss {
 			Card card = new Card();
 			switch(i%4) {
 			case 0:
-				card.setPattern("H");
+				card.setPattern("♥");
 				break;
 			case 1:
-				card.setPattern("S");
+				card.setPattern("♠");
 				break;
 			case 2:
-				card.setPattern("D");
+				card.setPattern("♦");
 				break;
 			case 3:
-				card.setPattern("C");
+				card.setPattern("♣");
 				break;
 			}
 			switch(i%13) {
@@ -67,23 +66,28 @@ public class Boss {
 		return deck;
 		
 	}
-	public Card getCard(ArrayList<Card> deck) {
+	public Card getCard(ArrayList<Card> deck,float f) {
+		int num;
 		int size = deck.size();
-		num = (int)Math.random()*size;
+		num = (int)(f*size);
 		Card card = deck.get(num);
 		deck.remove(num);
 		return card;
 	}
-	public ArrayList<Card> bossGetCard(int bossSum,ArrayList<Card> deck, ArrayList<Card> bossCard){
+	public ArrayList<Card> bossGetCard(int bossSum,ArrayList<Card> deck, ArrayList<Card> bossCard,float f){
 		Boss boss = new Boss();
 		Rule rule = new Rule();
 		int sum = bossSum;
 		
 		while(sum<17) {
-			Card card = boss.getCard(deck);
+			Card card = boss.getCard(deck,f);
 			bossCard.add(card);
 			sum = rule.getSum(bossCard,11);
 		}
 		return bossCard;
+	}
+	public Card hit(Boss boss, ArrayList<Card> deck, float f) {
+		Card card = boss.getCard(deck,f);
+    	return card;
 	}
 }
