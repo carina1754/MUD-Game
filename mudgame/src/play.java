@@ -31,14 +31,13 @@ public class play extends JFrame{
     public static int columns = 31;//맵의 세로축 길이
     public static int panelSize = 25;//맵 타일 하나의 사이즈
     public static int map[][] = new int[columns+1][rows+1];//지도 배열
-    public static int endLevelLoc=30;//출구의 y축 위치
     
     Player player;//플레이어 객체 생성
     Random random = new Random();//카드를 랜덤으로 뽑기 위한 변수
     int gameflag = 0;//플레이어의 체력 FLAG
      int x;//현재 위치의 가로 값
 	 int y;//현재 위치의 세로 값
-	 int count;//처치한 보스의 수
+	 int count=0;//처치한 보스의 수
 	 int bossnum=0;//맵에 표시된 보스의 수
 	 int bossmap[][] = new int [9][4];//보스 저장 배열
 	 int bossattack =1;//보스 기본 공격력(1단계)
@@ -520,7 +519,7 @@ public class play extends JFrame{
 					 		new play();
 					 	}
 					 	
-    					if(x == 29 && y == endLevelLoc){//도착지에 도착했을 때
+    					if(x == 29 && y == 30 && count==4){//도착지에 도착했을 때
     						if(count>=4) {//보스를 4마리 이상 잡았을 때 새로운 게임 시작
     					    String[] buttons = {"다음 라운드","그만하기"};
 					        int num = JOptionPane.showOptionDialog(null, "보물을 찾았습니다! 다음 라운드로 진행 하겠습니까?", "보물 찾기 성공!",
